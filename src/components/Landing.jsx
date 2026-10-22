@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { call, friendly } from '../api'
 import { play } from '../sound'
 
@@ -12,7 +12,12 @@ export default function Landing({ initialCode, onEnter }) {
   const [joinText, setJoinText] = useState(initialCode || '')
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
+  const cardRef = useRef(null)
 
+  const reveal = () => {
+    cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    setTimeout(() => cardRef.current?.querySelector('input')?.focus({ preventScroll: true }), 400)
+  }
   const run = async (action, params) => {
     const clean = name.trim()
     if (!clean) return setErr(friendly('INVALID_NAME'))
@@ -27,20 +32,23 @@ export default function Landing({ initialCode, onEnter }) {
 
   return (
     <main className="landing">
-      <h1 className="logo">Rock <span>Paper</span> Scissors</h1>
-      <p className="tag">Private rooms. Real opponents. First to 3 wins.</p>
-      <div className="card glass">
-        <label htmlFor="name">Your display name</label>
-        <input id="name" value={name} maxLength={20} placeholder="e.g. NeonFox" onChange={(e) => setName(e.target.value)} />
-        <button className="btn primary" disabled={busy} onClick={() => run('create')}>Create a room</button>
-        <div className="or">or join a friend</div>
+      <section className="hero">
+        <div className="bigheart" aria-hidden="true">💗</div>
+        <h1 className="enter e1">Just You &amp; Me ♡</h1>
+        <p className="sub enter e2">One little game, a million little smiles.</p>
+        <button className="btn primary big enter e3" onClick={reveal}>Let&apos;s Play Together 💗</button>
+      </section>
+      <div className="card glass enter e4" ref={cardRef}>
+        <label htmlFor="name">Your name</label>
+        <input id="name" value={name} maxLength={20} placeholder="What should I call you?" onChange={(e) => setName(e.target.value)} />
+        <button className="btn primary" disabled={busy} onClick={() => run('create')}>Create our room 💌</button>
+        <div className="or">or join your person</div>
         <label htmlFor="code">Room code or invite link</label>
-        <input id="code" value={joinText} placeholder="ABCDE or https://…/?room=ABCDE" onChange={(e) => setJoinText(e.target.value)} />
-        <button className="btn cyan" disabled={busy || !joinText.trim()} onClick={() => run('join', { code: parseCode(joinText) })}>Join room</button>
-        {busy && <p className="muted" role="status">Working…</p>}
+        <input id="code" value={joinText} placeholder="ABCDE or the invite link" onChange={(e) => setJoinText(e.target.value)} />
+        <button className="btn lav" disabled={busy || !joinText.trim()} onClick={() => run('join', { code: parseCode(joinText) })}>Join room 💞</button>
+        {busy && <p className="muted" role="status"><span className="dots">Sending love</span></p>}
         {err && <p className="error" role="alert">{err}</p>}
       </div>
-      <div className="floaters" aria-hidden="true"><span>🪨</span><span>📄</span><span>✂️</span></div>
     </main>
   )
 }
